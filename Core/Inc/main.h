@@ -69,14 +69,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define USER_BUTTON_Pin GPIO_PIN_13
-#define USER_BUTTON_GPIO_Port GPIOC
 #define VBUS_SENSE_Pin GPIO_PIN_2
 #define VBUS_SENSE_GPIO_Port GPIOC
 #define ToF_IT_Pin GPIO_PIN_3
 #define ToF_IT_GPIO_Port GPIOC
+#define ToF_IT_EXTI_IRQn EXTI3_IRQn
 #define UCPD_FLT_Pin GPIO_PIN_14
 #define UCPD_FLT_GPIO_Port GPIOB
+#define UCPD_FLT_EXTI_IRQn EXTI14_IRQn
 #define ST_LINK_VCP_TX_Pin GPIO_PIN_7
 #define ST_LINK_VCP_TX_GPIO_Port GPIOG
 #define ST_LINK_VCP_RX_Pin GPIO_PIN_8

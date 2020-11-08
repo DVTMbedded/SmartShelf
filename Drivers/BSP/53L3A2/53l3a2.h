@@ -130,7 +130,7 @@ extern void XNUCLEO53L3A2_USART2_UART_Init(void);
  * @brief select GPIO1 to exti mapping for center or shared interrupt
  *
  * Set option value or un-define it to match with board configuration
- * @li not defined or 0  : U14=On  and U17=off  => GPIO1_C = PA4
+ * @li not defined or 0  : U14=On  and U17=off  => GPIO1_C = PC3
  * @li defined and not 0 : U14=Off and U17=on  => GPIO1_C = PC1
  */
 #   define VL53L3A2_GPIO1_C_OPTION 0
@@ -164,11 +164,11 @@ extern void XNUCLEO53L3A2_USART2_UART_Init(void);
 
 
 #if VL53L3A2_GPIO1_C_OPTION == 0
-#   define VL53L3A2_GPIO1_C_GPIO_PORT   GPIOA
-#   define VL53L3A2_GPIO1_C_CLK_ENABLE  __GPIOA_CLK_ENABLE
-#   define VL53L3A2_GPIO1_C_GPIO_PIN    GPIO_PIN_4
+#   define VL53L3A2_GPIO1_C_GPIO_PORT   GPIOC
+#   define VL53L3A2_GPIO1_C_CLK_ENABLE  __GPIOC_CLK_ENABLE
+#   define VL53L3A2_GPIO1_C_GPIO_PIN    GPIO_PIN_3
 #   if defined(STM32L552xx) || defined(STM32L476xx) || defined(STM32F401xC)
-#       define VL53L3A2_GPIO1_C_INTx       EXTI4_IRQn
+#       define VL53L3A2_GPIO1_C_INTx       EXTI3_IRQn
 #       define VL53L3A2_EXTI4_USE_PIN      VL53L3A2_GPIO1_C_GPIO_PIN
 #   endif
 #   if defined(STM32L053xx)
@@ -192,11 +192,11 @@ extern void XNUCLEO53L3A2_USART2_UART_Init(void);
 #if VL53L3A2_GPIO1_SHARED == 0
 /* not shared interrupt configuration */
 #if VL53L3A2_GPIO1_L_OPTION == 0
-#   define VL53L3A2_GPIO1_L_GPIO_PORT   GPIOC
-#   define VL53L3A2_GPIO1_L_CLK_ENABLE  __GPIOC_CLK_ENABLE
-#   define VL53L3A2_GPIO1_L_GPIO_PIN    GPIO_PIN_7
+#   define VL53L3A2_GPIO1_L_GPIO_PORT   GPIOD
+#   define VL53L3A2_GPIO1_L_CLK_ENABLE  __GPIOD_CLK_ENABLE
+#   define VL53L3A2_GPIO1_L_GPIO_PIN    GPIO_PIN_15
 #   if defined(STM32L552xx) || defined(STM32L476xx) || defined(STM32F401xC)
-#       define VL53L3A2_GPIO1_L_INTx       EXTI9_IRQn
+#       define VL53L3A2_GPIO1_L_INTx       EXTI15_IRQn
 #       define VL53L3A2_EXTI9_5_USE_PIN    VL53L3A2_GPIO1_L_GPIO_PIN
 #   endif // STM32L552xx
 #   if defined(STM32L053xx)
@@ -228,11 +228,11 @@ extern void XNUCLEO53L3A2_USART2_UART_Init(void);
 #endif //else VL53L3A2_GPIO1_L_OPTION
 
 #if VL53L3A2_GPIO1_R_OPTION == 0
-#   define VL53L3A2_GPIO1_R_GPIO_PORT   GPIOA
-#   define VL53L3A2_GPIO1_R_CLK_ENABLE  __GPIOA_CLK_ENABLE
-#   define VL53L3A2_GPIO1_R_GPIO_PIN    GPIO_PIN_10
+#   define VL53L3A2_GPIO1_R_GPIO_PORT   GPIOF
+#   define VL53L3A2_GPIO1_R_CLK_ENABLE  __GPIOF_CLK_ENABLE
+#   define VL53L3A2_GPIO1_R_GPIO_PIN    GPIO_PIN_14
 #   if defined(STM32L552xx) || defined(STM32L476xx) || defined(STM32F401xC)
-#       define VL53L3A2_GPIO1_R_INTx       EXTI15_IRQn
+#       define VL53L3A2_GPIO1_R_INTx       EXTI14_IRQn
 #       define VL53L3A2_EXTI15_10_USE_PIN  VL53L3A2_GPIO1_R_GPIO_PIN
 #   endif // STM32L552xx
 #   if defined(STM32L053xx)

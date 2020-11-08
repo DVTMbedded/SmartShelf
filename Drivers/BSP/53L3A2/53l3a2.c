@@ -298,7 +298,7 @@ int XNUCLEO53L3A2_I2C1Configure() {
     XNUCLEO53L3A2_hi2c.Init.DutyCycle = I2C_DUTYCYCLE_2;
 #else
     /* STM32L4xx and L053 */
-    XNUCLEO53L3A2_hi2c.Init.Timing = 0x00300F38; /* set 400KHz fast mode i2c*/
+    XNUCLEO53L3A2_hi2c.Init.Timing = 0x2050133E;//0x00300F38; /* set 400KHz fast mode i2c*/
 #endif
     XNUCLEO53L3A2_hi2c.Init.OwnAddress1 = 0;
     XNUCLEO53L3A2_hi2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
