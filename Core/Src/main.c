@@ -111,6 +111,8 @@ int main(void)
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
 
+#if 0
+  /* This is test of the I2C communication with STMPE1600 and VL53L3CX*/
   uint8_t arrRegisterToAccess[3];
 
   // Set STMPE1600 GPIO15 as output (LSB)
@@ -142,7 +144,7 @@ int main(void)
   {
 	  HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
   }
-
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
