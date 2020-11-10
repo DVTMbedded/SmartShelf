@@ -1,8 +1,8 @@
 /*
- * uart_commands.h
- *
- *  Created on: 1.08.2018 �.
- *      Author: trifonovd
+ *  @file:   console_services.c
+ *  @Author: Denislav Trifonov
+ *  @Date:   10.11.2020
+ *  @brief: This file contains UART console commands
  */
 
 #ifndef UART_COMMANDS_H_
@@ -14,9 +14,6 @@
 
 #include "stm32l5xx_hal.h"
 #include "console_drv.h"
-
-void Function_Help(uint8_t *RxBuff);
-void Function_Unknown(uint8_t *RxBuff);
 
 
 extern void (*FuncPtr[])(uint8_t *RxData);

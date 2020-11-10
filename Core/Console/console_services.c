@@ -1,16 +1,16 @@
 /*
- * Console_commands.c
- *
- *  Created on: 13.07.2018 �.
- *      Author: trifonovd
+ *  @file:   console_services.c
+ *  @Author: Denislav Trifonov
+ *  @Date:   10.11.2020
+ *  @brief: This file contains UART console commands
  */
-
-/* User implemented commands */
 
 
 #include <console_services.h>
 
 
+static void Service_Help(uint8_t *RxBuff);
+static void Service_Unknown(uint8_t *RxBuff);
 
 /* ====================================================== */
 /* Available commands  */
@@ -23,19 +23,19 @@ const char*  UartCommands[] = {
 /* Depending on the written command the corresponding function is executed. */
 void (*FuncPtr[])(uint8_t *RxData) =
 {
-		&Function_Help,
-		&Function_Unknown
+		&Service_Help,
+		&Service_Unknown
 };
 /* ====================================================== */
-void Function_Help(uint8_t *RxBuff)
+void Service_Help(uint8_t *RxBuff)
 /* ====================================================== */
 {
-	Console_Puts("	Available commands:\r\n");
-	Console_Puts("	HELP - This information\r\n:");
+	Console_Puts("Available commands:\r\n");
+	Console_Puts("HELP - This information\r\n:");
 }
 
 /* ====================================================== */
-void Function_Unknown(uint8_t *RxBuff)
+void Service_Unknown(uint8_t *RxBuff)
 /* ====================================================== */
 {
 	Console_Puts("Unknown Command!\r\n");
