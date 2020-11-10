@@ -25,7 +25,8 @@
 /* USER CODE BEGIN Includes */
 #include "vl53lx_api.h"
 #include "53L3A2.h"
-#include "console_drv.h"
+#include "console.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,8 +48,6 @@ ADC_HandleTypeDef hadc1;
 
 I2C_HandleTypeDef hi2c1;
 
-UART_HandleTypeDef hlpuart1;
-
 RTC_HandleTypeDef hrtc;
 
 PCD_HandleTypeDef hpcd_USB_FS;
@@ -66,7 +65,6 @@ volatile int IntCount;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_LPUART1_UART_Init(void);
 static void MX_RTC_Init(void);
 static void MX_UCPD1_Init(void);
 static void MX_USB_PCD_Init(void);
@@ -114,14 +112,12 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	MX_ADC1_Init();
-	MX_LPUART1_UART_Init();
 	MX_RTC_Init();
 	MX_UCPD1_Init();
 	MX_USB_PCD_Init();
 	MX_I2C1_Init();
 	/* USER CODE BEGIN 2 */
-
-	Console_Init(&hlpuart1);
+	Console_Init();
 
 	XNUCLEO53L3A2_Init();
 
@@ -155,7 +151,7 @@ int main(void)
 
 		/* USER CODE BEGIN 3 */
 		//RangingLoop();
-		Console_Process();
+		Console_Exec();
 
 	}
 	/* USER CODE END 3 */
@@ -323,54 +319,6 @@ static void MX_I2C1_Init(void)
 	/* USER CODE BEGIN I2C1_Init 2 */
 
 	/* USER CODE END I2C1_Init 2 */
-
-}
-
-/**
- * @brief LPUART1 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_LPUART1_UART_Init(void)
-{
-
-	/* USER CODE BEGIN LPUART1_Init 0 */
-
-	/* USER CODE END LPUART1_Init 0 */
-
-	/* USER CODE BEGIN LPUART1_Init 1 */
-
-	/* USER CODE END LPUART1_Init 1 */
-	hlpuart1.Instance = LPUART1;
-	hlpuart1.Init.BaudRate = 115200;
-	hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
-	hlpuart1.Init.StopBits = UART_STOPBITS_1;
-	hlpuart1.Init.Parity = UART_PARITY_NONE;
-	hlpuart1.Init.Mode = UART_MODE_TX_RX;
-	hlpuart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	hlpuart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	hlpuart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-	hlpuart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	hlpuart1.FifoMode = UART_FIFOMODE_DISABLE;
-	if (HAL_UART_Init(&hlpuart1) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetTxFifoThreshold(&hlpuart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetRxFifoThreshold(&hlpuart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	if (HAL_UARTEx_DisableFifoMode(&hlpuart1) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	/* USER CODE BEGIN LPUART1_Init 2 */
-
-	/* USER CODE END LPUART1_Init 2 */
 
 }
 
@@ -581,10 +529,6 @@ void RangingLoop(void)
 	int no_of_object_found=0,j;
 	//printf("Ranging loop starts\n");
 
-	uint8_t rxData = 0;
-
-	HAL_UART_Receive_IT(&hlpuart1, &rxData, 1);
-
 	status = VL53LX_WaitDeviceBooted(Dev);
 	status = VL53LX_DataInit(Dev);
 	status = VL53LX_StartMeasurement(Dev);
@@ -679,16 +623,8 @@ void RangingLoop(void)
 				}
 			}
 		}
-		while (1);
-	}
+		while (1);}
 }
-
-#if 0
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-
-}
-#endif
 
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 {
@@ -716,27 +652,11 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
  */
 void Error_Handler(void)
 {
+
+}
 	/* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 
 	/* USER CODE END Error_Handler_Debug */
-}
-
-#ifdef  USE_FULL_ASSERT
-/**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
-void assert_failed(uint8_t *file, uint32_t line)
-{ 
-	/* USER CODE BEGIN 6 */
-	/* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-	/* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

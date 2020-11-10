@@ -12,29 +12,45 @@
 #ifndef CONSOLE_DRV_H_
 #define CONSOLE_DRV_H_
 
+#include <console.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
-
 #include "stm32l5xx_hal.h"
-#include "console_services.h"
 
+typedef enum {
+	USART_1,
+	USART_2
+}USART_MODULE;
 
-void  Console_Init(UART_HandleTypeDef *pUart);
-void  Console_Process(void);
-void  Console_Putc(uint8_t Symbol);
-void  Console_Puts(char *Message);
-void  Console_Printf(char *Message, ...);
-int   Console_GetMessageLength(char *Message);
-char* Console_GetNextArgument(char *Message);
-int   Console_ConvertArgumentToDigit(char *Message);
+typedef enum {
+	STATUS_OK,
+	STATUS_ERROR
+}CONSOLE_STATUS;
 
+typedef enum {
+	CMD_NOT_RECEIVED,
+	CMD_RECEIVED,
+	CMD_FOUND,
+	CMD_NOT_FOUND
+}COMMAND_STATUS;
 
-
-
-
+CONSOLE_STATUS      ConsoleDrv_Init(USART_TypeDef* eModule);
+void                ConsoleDrv_Start();
+void                ConsoleDrv_Putc(uint8_t Symbol);
+void                ConsoleDrv_Puts(char *Message);
+void                ConsoleDrv_Printf(char *Message, ...);
+int                 ConsoleDrv_GetMessageLength(char *Message);
+char*               ConsoleDrv_GetNextArgument(char *Message);
+int                 ConsoleDrv_ConvertArgumentToDigit(char *Message);
+void                ConsoleDrv_SetCommandStatus(COMMAND_STATUS eCmdStatus);
+COMMAND_STATUS      ConsoleDrv_CheckCommandStatus();
+uint8_t*            ConsoleDrv_GetReceivedCmd();
+void                ConsoleDrv_OnCommandExecuted();
+void                ConsoleDrv_ClearDrvBuffers();
+UART_HandleTypeDef* ConsoleDrv_GetUartHandleTypeDef();
 
 
 #endif /* Console_DRV_H_ */

@@ -11,13 +11,11 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
-
 #include "stm32l5xx_hal.h"
 #include "console_drv.h"
 
-
-extern void (*FuncPtr[])(uint8_t *RxData);
-extern const char*  UartCommands[];
+void  Console_Init();
+void  Console_Exec(void);
 
 
 #endif /* UART_COMMANDS_H_ */
