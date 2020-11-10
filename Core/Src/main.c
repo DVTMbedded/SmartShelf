@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "vl53lx_api.h"
 #include "53L3A2.h"
+#include "console_drv.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -120,6 +121,8 @@ int main(void)
 	MX_I2C1_Init();
 	/* USER CODE BEGIN 2 */
 
+	Console_Init(&hlpuart1);
+
 	XNUCLEO53L3A2_Init();
 
 	Dev->I2cHandle = &hi2c1;
@@ -142,9 +145,6 @@ int main(void)
 	VL53LX_RdWord(Dev, 0x010F, &wordData);
 	//printf("VL53LX: %02X\n\r", wordData);
 
-	RangingLoop();
-
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -154,6 +154,9 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+		//RangingLoop();
+		Console_Process();
+
 	}
 	/* USER CODE END 3 */
 }
@@ -339,7 +342,7 @@ static void MX_LPUART1_UART_Init(void)
 
 	/* USER CODE END LPUART1_Init 1 */
 	hlpuart1.Instance = LPUART1;
-	hlpuart1.Init.BaudRate = 209700;
+	hlpuart1.Init.BaudRate = 115200;
 	hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
 	hlpuart1.Init.StopBits = UART_STOPBITS_1;
 	hlpuart1.Init.Parity = UART_PARITY_NONE;
@@ -578,6 +581,10 @@ void RangingLoop(void)
 	int no_of_object_found=0,j;
 	//printf("Ranging loop starts\n");
 
+	uint8_t rxData = 0;
+
+	HAL_UART_Receive_IT(&hlpuart1, &rxData, 1);
+
 	status = VL53LX_WaitDeviceBooted(Dev);
 	status = VL53LX_DataInit(Dev);
 	status = VL53LX_StartMeasurement(Dev);
@@ -698,7 +705,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
-	HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+
 }
 
 /* USER CODE END 4 */
