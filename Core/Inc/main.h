@@ -40,6 +40,11 @@ extern "C" {
 #include "stm32l5xx_ll_dma.h"
 
 #include "stm32l5xx_ll_exti.h"
+#include "console.h"
+#include "tof.h"
+#include "led.h"
+#include  <D:\Work\University\Master Thesis\Firmware\SmartShelf\Core\System\system.h>
+#include "rtc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -62,7 +67,6 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 

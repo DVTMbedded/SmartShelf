@@ -8,16 +8,19 @@
 #include "console.h"
 
 static void Service_Help(uint8_t *RxBuff);
+static void Service_GetDistance(uint8_t *RxBuff);
 static void Service_Unknown(uint8_t *RxBuff);
 
 static const char*  UartCommands[] = {
 		"HELP",
+		"GETD",
 		""
 };
 
 static void (*FuncPtr[])(uint8_t *RxData) =
 {
 		&Service_Help,
+		&Service_GetDistance,
 		&Service_Unknown
 };
 
@@ -27,6 +30,37 @@ void  Console_Init()
 {
 	ConsoleDrv_Init(LPUART1);
 	ConsoleDrv_Start();
+}
+
+/* ======================================================*/
+static void Service_GetDistance(uint8_t *RxBuff)
+/* ======================================================*/
+{
+	VL53LX_MultiRangingData_t* pData = NULL;
+
+	if (ToF_Measure(TOF_CENTRAL) == TOF_STATUS_OK)
+	{
+		pData = ToF_GetDistance_mm(TOF_CENTRAL);
+
+		if (pData != NULL)
+		{
+			//ConsoleDrv_Printf("Distance: %d mm", nDistance);
+#if 1
+			for (uint8_t i = 0; i < pData->NumberOfObjectsFound; i++)
+			{
+				ConsoleDrv_Printf("Distance %d: %d mm", i, pData->RangeData[i].RangeMilliMeter);
+			}
+#endif
+		}
+		else
+		{
+			ConsoleDrv_Puts("Error measuring distance!");
+		}
+	}
+	else
+	{
+		ConsoleDrv_Puts("Error measuring distance!");
+	}
 }
 
 /* ======================================================*/
@@ -68,6 +102,7 @@ void Service_Help(uint8_t *RxBuff)
 {
 	ConsoleDrv_Puts(" Available commands:\r\n");
 	ConsoleDrv_Puts("  - HELP - This information\r\n");
+	ConsoleDrv_Puts("  - GETD - Get ToF sensor measurement\r\n");
 }
 
 /* ====================================================== */

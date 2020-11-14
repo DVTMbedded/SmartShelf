@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include "stm32l5xx_hal.h"
 #include "console_drv.h"
+#include "tof.h"
 
 void  Console_Init();
 void  Console_Exec(void);

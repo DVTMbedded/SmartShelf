@@ -17,7 +17,6 @@
 /* ASCII CODES DEFINITIONS */
 #define FIFO_SIZE           1024
 
-static const char g_cAsciiSymbolColon   = ':';
 static const char g_cAsciiSymbolGreater = '>';
 static const char g_cAsciiSymbolNL	    = '\n';
 static const char g_cAsciiSymbolCR      = '\r';

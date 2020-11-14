@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "console_drv.h"
+#include "led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -189,7 +190,7 @@ void SysTick_Handler(void)
 	if (++m_nLedPeriodCntr == 500)
 	{
 		m_nLedPeriodCntr = 0;
-		HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		LEDs_ToggleLED(GREEN_LED);
 	}
 
   /* USER CODE END SysTick_IRQn 0 */
@@ -246,34 +247,6 @@ void EXTI14_IRQHandler(void)
   /* USER CODE BEGIN EXTI14_IRQn 1 */
 
   /* USER CODE END EXTI14_IRQn 1 */
-}
-
-/**
-  * @brief This function handles I2C1 event interrupt / I2C1 wake-up interrupt through EXTI line 23.
-  */
-void I2C1_EV_IRQHandler(void)
-{
-  /* USER CODE BEGIN I2C1_EV_IRQn 0 */
-
-  /* USER CODE END I2C1_EV_IRQn 0 */
-  HAL_I2C_EV_IRQHandler(&hi2c1);
-  /* USER CODE BEGIN I2C1_EV_IRQn 1 */
-
-  /* USER CODE END I2C1_EV_IRQn 1 */
-}
-
-/**
-  * @brief This function handles I2C1 error interrupt.
-  */
-void I2C1_ER_IRQHandler(void)
-{
-  /* USER CODE BEGIN I2C1_ER_IRQn 0 */
-
-  /* USER CODE END I2C1_ER_IRQn 0 */
-  HAL_I2C_ER_IRQHandler(&hi2c1);
-  /* USER CODE BEGIN I2C1_ER_IRQn 1 */
-
-  /* USER CODE END I2C1_ER_IRQn 1 */
 }
 
 /**
