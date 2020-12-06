@@ -36,6 +36,7 @@ typedef enum {
 	STATE_INIT_IN_PROCESS,
 	STATE_IDLE,
 	STATE_MEASURING,
+	STATE_IGNORE_FIRST_DATA,
 	STATE_ERROR
 }TOF_STATE;
 
@@ -55,8 +56,10 @@ typedef enum {
 }PCB_USED;
 
 void ToF_Init(TOF_SUPPORTED_SENSORS eSensor);
+void ToF_Exec();
 TOF_STATUS ToF_Measure(TOF_SUPPORTED_SENSORS eSensor);
 VL53LX_MultiRangingData_t* ToF_GetDistance_mm(TOF_SUPPORTED_SENSORS eSensor);
+//uint16_t Tof_GetDistanceAveraged_mm(TOF_SUPPORTED_SENSORS eSensor);
 
 void ToF_Exec();
 

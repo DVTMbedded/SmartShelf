@@ -9,8 +9,13 @@
 
 static I2C_HandleTypeDef hi2c1;
 static I2C_STATUS g_eI2cStatus                = I2C_STATUS_NOT_INIT;
-static PCB_USED   g_eUsedPCB                  = XNUCLEO_53L3A2;
+static PCB_USED   g_eUsedPCB                  = CUSTOM_PCB;
 static TOF_MEASURING_MODE g_eTofMeasuringMode = TOF_MEASURING_MODE_INTERRUPT;
+
+static uint8_t g_cNumberOfMeasurementsForSingleDistance = 5;
+static uint8_t g_nCntrNumberOfMeasurements[SENSORS_SUPPORTED] = {0};
+static uint16_t g_arrMeasurementsForSingleDistance[SENSORS_SUPPORTED][5];
+static uint32_t g_nMeasurementAveraged[SENSORS_SUPPORTED];
 
 static TOF_STATE g_eToFSensorState[SENSORS_SUPPORTED] = {STATE_NOT_INIT};
 
@@ -19,7 +24,7 @@ static uint8_t g_arrToFSensorInterruptStatus[SENSORS_SUPPORTED];
 static uint8_t g_nVL53L3CX_Address[SENSORS_SUPPORTED] = {0x52};
 
 static GPIO_InitTypeDef g_arrToFGPIOs[SENSORS_SUPPORTED] = {
-		{GPIO_PIN_3, GPIO_MODE_IT_FALLING, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, 0}};
+		{GPIO_PIN_3, GPIO_MODE_IT_RISING_FALLING, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, 0}};
 
 static GPIO_TypeDef* g_arrToFPorts[SENSORS_SUPPORTED] =
 {GPIOC};
@@ -29,6 +34,12 @@ static IRQn_Type g_arrToFGPIOInterruptSources[SENSORS_SUPPORTED] =
 
 static uint8_t g_arrToFGPIOInterruptPriority[SENSORS_SUPPORTED] =
 {0};
+
+static GPIO_InitTypeDef g_arrToFXShutDownPin[SENSORS_SUPPORTED] = {
+		{GPIO_PIN_2, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, 0}};
+
+static GPIO_TypeDef* g_arrToFXShutDownPorts[SENSORS_SUPPORTED] =
+{GPIOA};
 
 static VL53LX_Dev_t g_ToFSensorDriverData[SENSORS_SUPPORTED];
 static VL53LX_MultiRangingData_t g_ToFSensorMeasurementData[SENSORS_SUPPORTED];
@@ -88,6 +99,14 @@ void ToF_Init(TOF_SUPPORTED_SENSORS eSensor)
 		}
 	}
 
+	else if (g_eUsedPCB == CUSTOM_PCB)
+	{
+		HAL_GPIO_WritePin(g_arrToFXShutDownPorts[eSensor], g_arrToFXShutDownPin[eSensor].Pin, GPIO_PIN_RESET);
+		HAL_Delay(2);
+		HAL_GPIO_WritePin(g_arrToFXShutDownPorts[eSensor], g_arrToFXShutDownPin[eSensor].Pin, GPIO_PIN_SET);
+		HAL_Delay(2);
+	}
+
 	// Check the I2C communication with VL53L3CX
 	VL53LX_RdByte(&g_ToFSensorDriverData[eSensor], 0x010F, &nDummyByte);
 	if (nDummyByte != 0xEA)
@@ -112,12 +131,25 @@ void ToF_Init(TOF_SUPPORTED_SENSORS eSensor)
 		LEDs_SetLEDState(RED_LED, LED_ON);
 	}
 
-	if (VL53LX_PerformXTalkCalibration(&g_ToFSensorDriverData[eSensor]))
+	VL53LX_CalibrationData_t CalibrationData;
+	VL53LX_GetCalibrationData(&g_ToFSensorDriverData[eSensor], &CalibrationData);
+
+	if (VL53LX_SetCalibrationData(&g_ToFSensorDriverData[eSensor], &CalibrationData))
 	{
 		LEDs_SetLEDState(RED_LED, LED_ON);
 	}
 
-	if (VL53LX_SetDistanceMode(&g_ToFSensorDriverData[eSensor], VL53LX_DISTANCEMODE_SHORT))
+	if (VL53LX_SetDistanceMode(&g_ToFSensorDriverData[eSensor], 1))
+	{
+		LEDs_SetLEDState(RED_LED, LED_ON);
+	}
+
+	if (VL53LX_SetTuningParameter(&g_ToFSensorDriverData[eSensor], VL53LX_TUNINGPARM_PHASECAL_PATCH_POWER, 2))
+	{
+		LEDs_SetLEDState(RED_LED, LED_ON);
+	}
+
+	if (VL53LX_SmudgeCorrectionEnable(&g_ToFSensorDriverData[eSensor], VL53LX_SMUDGE_CORRECTION_CONTINUOUS))
 	{
 		LEDs_SetLEDState(RED_LED, LED_ON);
 	}
@@ -128,87 +160,116 @@ void ToF_Init(TOF_SUPPORTED_SENSORS eSensor)
 	}
 }
 
+/* @brief: This function is called in the main loop.
+ *         It implements the device driver state machine
+ */
+/* ======================================================*/
+void ToF_Exec()
+/* ======================================================*/
+{
+	for (uint8_t i = 0; i < SENSORS_SUPPORTED; i++)
+	{
+		// ToF sensor is not initialized
+		if (g_eToFSensorState[i] == STATE_NOT_INIT)
+		{
+			continue;
+		}
+
+		// ToF sensor is initializing
+		else if (g_eToFSensorState[i] == STATE_INIT_IN_PROCESS)
+		{
+			// Check if interrupt has occurred
+			//if (g_arrToFSensorInterruptStatus[i])
+			if (HAL_GPIO_ReadPin(g_arrToFPorts[i], g_arrToFGPIOs[i].Pin) == GPIO_PIN_RESET)
+			{
+				if(!VL53LX_GetMultiRangingData(&g_ToFSensorDriverData[i], &g_ToFSensorMeasurementData[i]))
+				{
+					// Perform measurement which has to be ignored
+					if (!VL53LX_ClearInterruptAndStartMeasurement(&g_ToFSensorDriverData[i]))
+					{
+						g_eToFSensorState[i] = STATE_IGNORE_FIRST_DATA;
+					}
+					else
+					{
+						g_eToFSensorState[i] = STATE_ERROR;
+					}
+				}
+				else
+				{
+					g_eToFSensorState[i] = STATE_ERROR;
+				}
+			}
+		}
+
+		// First data needs to be ignored (when the distance is changing)
+		else if (g_eToFSensorState[i] == STATE_IGNORE_FIRST_DATA)
+		{
+			// Check if interrupt has occurred
+			if (HAL_GPIO_ReadPin(g_arrToFPorts[i], g_arrToFGPIOs[i].Pin) == GPIO_PIN_RESET)
+			{
+				if(!VL53LX_GetMultiRangingData(&g_ToFSensorDriverData[i], &g_ToFSensorMeasurementData[i]))
+				{
+					// Perform measurement which has to be ignored
+					if (!VL53LX_ClearInterruptAndStartMeasurement(&g_ToFSensorDriverData[i]))
+					{
+						g_eToFSensorState[i] = STATE_MEASURING;
+					}
+					else
+					{
+						g_eToFSensorState[i] = STATE_ERROR;
+					}
+				}
+				else
+				{
+					g_eToFSensorState[i] = STATE_ERROR;
+				}
+			}
+		}
+
+		// ToF sensor is performing measurement
+		else if (g_eToFSensorState[i] == STATE_MEASURING)
+		{
+			// Check if interrupt has occurred
+			if (HAL_GPIO_ReadPin(g_arrToFPorts[i], g_arrToFGPIOs[i].Pin) == GPIO_PIN_RESET)
+			{
+				if(!VL53LX_GetMultiRangingData(&g_ToFSensorDriverData[i], &g_ToFSensorMeasurementData[i]))
+				{
+					g_eToFSensorState[i] = STATE_IDLE;
+				}
+				else
+				{
+					g_eToFSensorState[i] = STATE_ERROR;
+				}
+			}
+		}
+	}
+}
+
 /* ======================================================*/
 TOF_STATUS ToF_Measure(TOF_SUPPORTED_SENSORS eSensor)
 /* ======================================================*/
 {
 	TOF_STATUS eStatus = TOF_STATUS_OK;
 
-	uint8_t NewDataReady = 0;
-	uint8_t status       = 0;
-
-	if (g_eToFSensorState[eSensor] == STATE_INIT_IN_PROCESS)
-	{
-		while (!g_arrToFSensorInterruptStatus[eSensor])
-		{}
-
-		g_arrToFSensorInterruptStatus[eSensor] = 0;
-
-		status = VL53LX_GetMultiRangingData(&g_ToFSensorDriverData[eSensor], &g_ToFSensorMeasurementData[eSensor]);
-
-		if (!status)
-		{
-			g_eToFSensorState[eSensor] = STATE_IDLE;
-		}
-		else
-		{
-			g_eToFSensorState[eSensor] = STATE_ERROR;
-			eStatus 				   = TOF_STATUS_ERROR;
-		}
-	}
-
 	if (g_eToFSensorState[eSensor] == STATE_IDLE)
 	{
 		if (g_eTofMeasuringMode == TOF_MEASURING_MODE_INTERRUPT)
 		{
-			if (!VL53LX_ClearInterruptAndStartMeasurement(&g_ToFSensorDriverData[eSensor]))
+			if(!VL53LX_GetMultiRangingData(&g_ToFSensorDriverData[eSensor], &g_ToFSensorMeasurementData[eSensor]))
 			{
-				g_eToFSensorState[eSensor] = STATE_MEASURING;
-
-				while (!g_arrToFSensorInterruptStatus[eSensor])
-				{}
-
-				g_arrToFSensorInterruptStatus[eSensor] = 0;
-				status = VL53LX_GetMultiRangingData(&g_ToFSensorDriverData[eSensor], &g_ToFSensorMeasurementData[eSensor]);
-
-				if (!status)
+				if (!VL53LX_ClearInterruptAndStartMeasurement(&g_ToFSensorDriverData[eSensor]))
 				{
-					g_eToFSensorState[eSensor] = STATE_IDLE;
+					g_eToFSensorState[eSensor] = STATE_IGNORE_FIRST_DATA;
 				}
 				else
 				{
-					eStatus 				   = TOF_STATUS_ERROR;
+					eStatus                    = TOF_STATUS_ERROR;
 					g_eToFSensorState[eSensor] = STATE_ERROR;
 				}
 			}
 			else
 			{
-				eStatus                    = TOF_STATUS_ERROR;
 				g_eToFSensorState[eSensor] = STATE_ERROR;
-			}
-		}
-
-		// TODO: Pooling mode is still not implemented!
-		else
-		{
-			while (!NewDataReady)
-			{
-				status = VL53LX_GetMeasurementDataReady(&g_ToFSensorDriverData[eSensor], &NewDataReady);
-				HAL_Delay(2);
-
-				if ((!status) && (NewDataReady != 0))
-				{
-					status = VL53LX_GetMultiRangingData(&g_ToFSensorDriverData[eSensor], &g_ToFSensorMeasurementData[eSensor]);
-
-					if (status == 0)
-					{
-						status = VL53LX_ClearInterruptAndStartMeasurement(&g_ToFSensorDriverData[eSensor]);
-					}
-					else
-					{
-						eStatus = TOF_STATUS_ERROR;
-					}
-				}
 			}
 		}
 	}
@@ -233,6 +294,18 @@ VL53LX_MultiRangingData_t* ToF_GetDistance_mm(TOF_SUPPORTED_SENSORS eSensor)
 
 	return pData;
 }
+
+#if 0
+/* ======================================================*/
+uint16_t Tof_GetDistanceAveraged_mm(TOF_SUPPORTED_SENSORS eSensor)
+/* ======================================================*/
+{
+	uint16_t nDistance              = g_nMeasurementAveraged[eSensor];
+	g_nMeasurementAveraged[eSensor] = 0;
+
+	return nDistance;
+}
+#endif
 
 /* Private function definitions  -----------------------------------------------*/
 
@@ -281,6 +354,12 @@ void GPIO_Init(TOF_SUPPORTED_SENSORS eSensor)
 	// Configure EXT interrupt
 	HAL_NVIC_SetPriority(g_arrToFGPIOInterruptSources[eSensor], g_arrToFGPIOInterruptPriority[eSensor], 0);
 	HAL_NVIC_EnableIRQ(g_arrToFGPIOInterruptSources[eSensor]);
+
+	// Initialize XShutdown pin if X-NUCLEO board is not used.
+	if (g_eUsedPCB == CUSTOM_PCB)
+	{
+		HAL_GPIO_Init(g_arrToFXShutDownPorts[eSensor], &g_arrToFXShutDownPin[eSensor]);
+	}
 }
 
 /* Interrupt callback definitions  -----------------------------------------------*/
@@ -293,6 +372,16 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 	if (GPIO_Pin==ToF_IT_Pin)
 	{
 		g_arrToFSensorInterruptStatus[TOF_CENTRAL] ++;
+	}
+}
+
+/* ======================================================*/
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+/* ======================================================*/
+{
+	if (GPIO_Pin==ToF_IT_Pin)
+	{
+		g_arrToFSensorInterruptStatus[TOF_CENTRAL] = 0;
 	}
 }
 

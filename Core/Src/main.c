@@ -36,5 +36,6 @@ int main(void)
 	while (1)
 	{
 		Console_Exec();
+		ToF_Exec();
 	}
 }
