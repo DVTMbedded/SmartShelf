@@ -26,13 +26,13 @@ typedef struct {
 	uint8_t     m_nLeftStock;
 }EEPROM_SHELF_INFO;
 
-void eeprom_init();
-void eeprom_readAll();
-void eeprom_registerNewShelf(EEPROM_SHELF_INFO *pShelf);
-void eeprom_updateShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock);
+void EEPROM_Init();
+void EEPROM_ReadAll();
+void EEPROM_RegisterNewShelf(EEPROM_SHELF_INFO *pShelf);
+void EEPROM_UpdateShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock);
 
-EEPROM_SHELF_INFO* eeprom_getShelf(uint8_t nIndex);
-uint8_t            eeprom_getTotalShelvesCount();
+EEPROM_SHELF_INFO* EEPROM_GetShelf(uint8_t nIndex);
+uint8_t            EEPROM_GetTotalShelvesCount();
 
 
 #endif /* INC_EEPROM_H_ */

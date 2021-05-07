@@ -20,10 +20,6 @@
 #include <stdlib.h>
 #include "bluenrg_def.h"
 
-#define X_OFFSET 200
-#define Y_OFFSET 50
-#define Z_OFFSET 1000
-
 /**
  * @brief Number of application services
  */
@@ -34,20 +30,6 @@
  *        In this sample application use only 1
  */
 #define SEND_N_QUATERNIONS 1
-
-/**
- * @brief Structure containing acceleration value of each axis.
- */
-typedef struct {
-  int32_t AXIS_X;
-  int32_t AXIS_Y;
-  int32_t AXIS_Z;
-} AxesRaw_t;
-
-enum {
-  ACCELERATION_SERVICE_INDEX = 0,
-  ENVIRONMENTAL_SERVICE_INDEX = 1
-};
 
 /** Documentation for C union Service_UUID_t */
 typedef union Service_UUID_t_s {
@@ -69,12 +51,11 @@ typedef union Char_UUID_t_s {
   uint8_t Char_UUID_128[16];
 } Char_UUID_t;
 
-tBleStatus Add_HWServW2ST_Service(void);
-tBleStatus Add_SWServW2ST_Service(void);
+tBleStatus GattDB_RegisterSmartShelfService(void);
+tBleStatus GattDB_GetHeaderCharacteristic(void);
+tBleStatus GattDB_UpdateSmartShelfLeftStock(uint8_t nLeftStock);
+
 void Read_Request_CB(uint16_t handle);
-tBleStatus BlueMS_Environmental_Update(void);
-tBleStatus Acc_Update(uint8_t nLeftStock);
-tBleStatus Quat_Update(AxesRaw_t *q_axes);
 
 extern uint8_t Services_Max_Attribute_Records[];
 

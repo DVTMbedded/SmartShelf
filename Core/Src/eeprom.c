@@ -40,14 +40,16 @@ static uint8_t           g_nShelvesCount = 0;
 
 /* @brief  Initialize the EEPROM - setting the low-level driver. */
 // ===========================================================
-void eeprom_init()
+void EEPROM_Init()
 // ===========================================================
 {
+	// Initialize SPI interface used for EEPROM and BLE peripherals
+	BSP_SPI1_Init();
 	M95640_Init();
 }
 
 // ===========================================================
-void eeprom_readAll()
+void EEPROM_ReadAll()
 // ===========================================================
 {
 	uint8_t arrEepromPage[32];
@@ -87,7 +89,7 @@ void eeprom_readAll()
 }
 
 // ===========================================================
-EEPROM_SHELF_INFO* eeprom_getShelf(uint8_t nIndex)
+EEPROM_SHELF_INFO* EEPROM_GetShelf(uint8_t nIndex)
 // ===========================================================
 {
 	if (nIndex < g_nShelvesCount)
@@ -101,7 +103,7 @@ EEPROM_SHELF_INFO* eeprom_getShelf(uint8_t nIndex)
 }
 
 // ===========================================================
-void eeprom_registerNewShelf(EEPROM_SHELF_INFO *pShelf)
+void EEPROM_RegisterNewShelf(EEPROM_SHELF_INFO *pShelf)
 // ===========================================================
 {
 	if (g_nShelvesCount < MAX_SHELVES_COUNT)
@@ -135,7 +137,7 @@ void eeprom_registerNewShelf(EEPROM_SHELF_INFO *pShelf)
 }
 
 // ===========================================================
-void eeprom_updateShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock)
+void EEPROM_UpdateShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock)
 // ===========================================================
 {
 	if (nIndex < g_nShelvesCount)
@@ -161,7 +163,7 @@ void eeprom_updateShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock)
 	}
 }
 // ===========================================================
-uint8_t eeprom_getTotalShelvesCount()
+uint8_t EEPROM_GetTotalShelvesCount()
 // ===========================================================
 {
 	return g_nShelvesCount;

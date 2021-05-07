@@ -20,7 +20,7 @@
 
 #define IDB04A1 0
 #define IDB05A1 1
-#define SENSOR_DEMO_NAME   'D','E','N','I','B','L','E'
+#define BLE_DEVICE_NAME   'S','M','A','R','T',' ','S', 'H', 'E', 'L', 'F'
 #define BDADDR_SIZE        6
 
 void Set_DeviceConnectable(void);

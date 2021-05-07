@@ -22,8 +22,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef APP_BLUENRG_MS_H
-#define APP_BLUENRG_MS_H
+#ifndef APP_BLUENRG_H
+#define APP_BLUENRG_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -32,12 +32,12 @@
 /* Includes ------------------------------------------------------------------*/
 
 /* Exported Functions --------------------------------------------------------*/
-void MX_BlueNRG_MS_Init(void);
-void MX_BlueNRG_MS_Process(void);
+void BlueNRG_Init(void);
+void BlueNRG_Process(void);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* APP_BLUENRG_MS_H */
+#endif /* APP_BLUENRG_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

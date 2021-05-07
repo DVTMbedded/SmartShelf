@@ -39,78 +39,72 @@
 			uuid_struct[12] = uuid_12; uuid_struct[13] = uuid_13; uuid_struct[14] = uuid_14; uuid_struct[15] = uuid_15; \
 		}while(0)
 
-/* Hardware Characteristics Service */
-#define COPY_HW_SENS_W2ST_SERVICE_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0x00,0x00,0x00,0x00,0x00,0x01,0x11,0xe1,0x9a,0xb4,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
-#define COPY_ENVIRONMENTAL_W2ST_CHAR_UUID(uuid_struct) COPY_UUID_128(uuid_struct,0x00,0x00,0x00,0x00,0x00,0x01,0x11,0xe1,0xac,0x36,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
-#define COPY_ACC_GYRO_MAG_W2ST_CHAR_UUID(uuid_struct)  COPY_UUID_128(uuid_struct,0x00,0xE0,0x00,0x00,0x00,0x01,0x11,0xe1,0xac,0x36,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
-/* Software Characteristics Service */
-#define COPY_SW_SENS_W2ST_SERVICE_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0x00,0x00,0x00,0x00,0x00,0x02,0x11,0xe1,0x9a,0xb4,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
-#define COPY_QUATERNIONS_W2ST_CHAR_UUID(uuid_struct)   COPY_UUID_128(uuid_struct,0x00,0x00,0x01,0x00,0x00,0x01,0x11,0xe1,0xac,0x36,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
+/* Service and charactersitics UUIDs */
+#define COPY_SMART_SHELF_SERVICE_UUID(uuid_struct)         COPY_UUID_128(uuid_struct,0x00,0x00,0x00,0x00,0x00,0x01,0x11,0xe1,0x9a,0xb4,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
+#define COPY_SMART_SHELF_HEADER_CHAR_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0x00,0x00,0x00,0x00,0x00,0x01,0x11,0xe1,0xac,0x36,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
+#define COPY_SMART_SHELF_LEFT_STOCK_CHAR_UUID(uuid_struct) COPY_UUID_128(uuid_struct,0x00,0xE0,0x00,0x00,0x00,0x01,0x11,0xe1,0xac,0x36,0x00,0x02,0xa5,0xd5,0xc5,0x1b)
 
-uint16_t HWServW2STHandle, EnvironmentalCharHandle, AccGyroMagCharHandle;
-uint16_t SWServW2STHandle, QuaternionsCharHandle;
-uint16_t headerDescrHandle;
-
-uint8_t nDescrValue = 1;
+uint16_t SmartShelfServiceHandle       = 0;
+uint16_t SmartShelfHeaderCharHandle    = 0;
+uint16_t SmartShelfLeftStockCharHandle = 0;
 
 /* UUIDS */
 Service_UUID_t service_uuid;
 Char_UUID_t char_uuid;
 
-extern AxesRaw_t x_axes;
-extern AxesRaw_t g_axes;
-extern AxesRaw_t m_axes;
-
 extern uint16_t connection_handle;
 extern uint32_t start_time;
 
 /**
- * @brief  Add the 'HW' service (and the Environmental and AccGyr characteristics).
+ * @brief  Add the main SmartShelf service (it contains 2 characteristics).
  * @param  None
  * @retval tBleStatus Status
  */
-tBleStatus Add_HWServW2ST_Service(void)
+tBleStatus GattDB_RegisterSmartShelfService(void)
 {
 	tBleStatus ret;
 	uint8_t uuid[16];
 
 	/* Add_HWServW2ST_Service */
-	COPY_HW_SENS_W2ST_SERVICE_UUID(uuid);
+	COPY_SMART_SHELF_SERVICE_UUID(uuid);
 	BLUENRG_memcpy(&service_uuid.Service_UUID_128, uuid, 16);
+
 	ret = aci_gatt_add_serv(UUID_TYPE_128, service_uuid.Service_UUID_128, PRIMARY_SERVICE,
-			1+3*5, &HWServW2STHandle);
+			1+3*5, &SmartShelfServiceHandle);
+
 	if (ret != BLE_STATUS_SUCCESS)
+	{
 		return BLE_STATUS_ERROR;
+	}
 
 	/* Fill the Environmental BLE Characteristic */
-	COPY_ENVIRONMENTAL_W2ST_CHAR_UUID(uuid);
+	COPY_SMART_SHELF_HEADER_CHAR_UUID(uuid);
 	uuid[14] |= 0x04; /* One Temperature value*/
 	uuid[14] |= 0x10; /* Pressure value*/
 	BLUENRG_memcpy(&char_uuid.Char_UUID_128, uuid, 16);
-	ret =  aci_gatt_add_char(HWServW2STHandle, UUID_TYPE_128, char_uuid.Char_UUID_128,
+
+	ret =  aci_gatt_add_char(SmartShelfServiceHandle, UUID_TYPE_128, char_uuid.Char_UUID_128,
 			7,
 			CHAR_PROP_NOTIFY|CHAR_PROP_READ,
 			ATTR_PERMISSION_NONE,
 			GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP,
-			16, 0, &EnvironmentalCharHandle);
+			16, 0, &SmartShelfHeaderCharHandle);
+
 	if (ret != BLE_STATUS_SUCCESS)
+	{
 		return BLE_STATUS_ERROR;
+	}
 
 	/* Fill the AccGyroMag BLE Characteristc */
-	COPY_ACC_GYRO_MAG_W2ST_CHAR_UUID(uuid);
+	COPY_SMART_SHELF_LEFT_STOCK_CHAR_UUID(uuid);
 	BLUENRG_memcpy(&char_uuid.Char_UUID_128, uuid, 16);
-	ret =  aci_gatt_add_char(HWServW2STHandle, UUID_TYPE_128, char_uuid.Char_UUID_128,
-			2,
+
+	ret =  aci_gatt_add_char(SmartShelfServiceHandle, UUID_TYPE_128, char_uuid.Char_UUID_128,
+			5,
 			CHAR_PROP_NOTIFY|CHAR_PROP_READ,
 			ATTR_PERMISSION_NONE,
 			GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP,
-			16, 0, &AccGyroMagCharHandle);
-	if (ret != BLE_STATUS_SUCCESS)
-		return BLE_STATUS_ERROR;
-
-	ret = aci_gatt_add_char_desc(HWServW2STHandle, EnvironmentalCharHandle, UUID_TYPE_128,
-			char_uuid.Char_UUID_128, 255, 1, &nDescrValue, ATTR_PERMISSION_NONE,
-			ATTR_ACCESS_READ_WRITE, GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP, 7, 0, &headerDescrHandle);
+			16, 0, &SmartShelfLeftStockCharHandle);
 
 	if (ret != BLE_STATUS_SUCCESS)
 	{
@@ -121,111 +115,26 @@ tBleStatus Add_HWServW2ST_Service(void)
 }
 
 /**
- * @brief  Add the SW Feature service using a vendor specific profile
- * @param  None
- * @retval tBleStatus Status
- */
-tBleStatus Add_SWServW2ST_Service(void)
-{
-	tBleStatus ret;
-	int32_t NumberOfRecords=1;
-	uint8_t uuid[16];
-
-	COPY_SW_SENS_W2ST_SERVICE_UUID(uuid);
-	BLUENRG_memcpy(&service_uuid.Service_UUID_128, uuid, 16);
-	ret = aci_gatt_add_serv(UUID_TYPE_128, service_uuid.Service_UUID_128, PRIMARY_SERVICE,
-			1+3*NumberOfRecords, &SWServW2STHandle);
-
-	if (ret != BLE_STATUS_SUCCESS) {
-		goto fail;
-	}
-
-	COPY_QUATERNIONS_W2ST_CHAR_UUID(uuid);
-	BLUENRG_memcpy(&char_uuid.Char_UUID_128, uuid, 16);
-	ret =  aci_gatt_add_char(SWServW2STHandle, UUID_TYPE_128, char_uuid.Char_UUID_128,
-			2+6*SEND_N_QUATERNIONS,
-			CHAR_PROP_NOTIFY,
-			ATTR_PERMISSION_NONE,
-			GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP,
-			16, 0, &QuaternionsCharHandle);
-
-	if (ret != BLE_STATUS_SUCCESS) {
-		goto fail;
-	}
-
-	return BLE_STATUS_SUCCESS;
-
-	fail:
-	return BLE_STATUS_ERROR;
-}
-
-/**
  * @brief  Update acceleration characteristic value
  * @param  AxesRaw_t structure containing acceleration value in mg.
  * @retval tBleStatus Status
  */
-tBleStatus Acc_Update(uint8_t nLeftStock)
+tBleStatus GattDB_UpdateSmartShelfLeftStock(uint8_t nLeftStock)
 {
-	uint8_t buff[2];
+	uint8_t buff[5];
 	tBleStatus ret;
 
-	buff[0] = 0; // Device index
+	buff[0] = nLeftStock; // Device index
 	buff[1] = nLeftStock;
+	buff[2] = nLeftStock;
+	buff[3] = nLeftStock;
+	buff[4] = nLeftStock;
 
-	ret = aci_gatt_update_char_value(HWServW2STHandle, AccGyroMagCharHandle,
-			0, 2, buff);
-	if (ret != BLE_STATUS_SUCCESS){
-		PRINTF("Error while updating Acceleration characteristic: 0x%02X\n",ret) ;
-		return BLE_STATUS_ERROR ;
-	}
+	ret = aci_gatt_update_char_value(SmartShelfServiceHandle, SmartShelfLeftStockCharHandle,
+			0, 5, buff);
 
-	return BLE_STATUS_SUCCESS;
-}
-
-/**
- * @brief  Update quaternions characteristic value
- * @param  SensorAxes_t *data Structure containing the quaterions
- * @retval tBleStatus      Status
- */
-tBleStatus Quat_Update(AxesRaw_t *data)
-{
-	tBleStatus ret;
-	uint8_t buff[2+6*SEND_N_QUATERNIONS];
-
-	HOST_TO_LE_16(buff,(HAL_GetTick()>>3));
-
-#if SEND_N_QUATERNIONS == 1
-	HOST_TO_LE_16(buff+2,data[0].AXIS_X);
-	HOST_TO_LE_16(buff+4,data[0].AXIS_Y);
-	HOST_TO_LE_16(buff+6,data[0].AXIS_Z);
-#elif SEND_N_QUATERNIONS == 2
-	HOST_TO_LE_16(buff+2,data[0].AXIS_X);
-	HOST_TO_LE_16(buff+4,data[0].AXIS_Y);
-	HOST_TO_LE_16(buff+6,data[0].AXIS_Z);
-
-	HOST_TO_LE_16(buff+8 ,data[1].AXIS_X);
-	HOST_TO_LE_16(buff+10,data[1].AXIS_Y);
-	HOST_TO_LE_16(buff+12,data[1].AXIS_Z);
-#elif SEND_N_QUATERNIONS == 3
-	HOST_TO_LE_16(buff+2,data[0].AXIS_X);
-	HOST_TO_LE_16(buff+4,data[0].AXIS_Y);
-	HOST_TO_LE_16(buff+6,data[0].AXIS_Z);
-
-	HOST_TO_LE_16(buff+8 ,data[1].AXIS_X);
-	HOST_TO_LE_16(buff+10,data[1].AXIS_Y);
-	HOST_TO_LE_16(buff+12,data[1].AXIS_Z);
-
-	HOST_TO_LE_16(buff+14,data[2].AXIS_X);
-	HOST_TO_LE_16(buff+16,data[2].AXIS_Y);
-	HOST_TO_LE_16(buff+18,data[2].AXIS_Z);
-#else
-#error SEND_N_QUATERNIONS could be only 1,2,3
-#endif
-
-	ret = aci_gatt_update_char_value(SWServW2STHandle, QuaternionsCharHandle,
-			0, 2+6*SEND_N_QUATERNIONS, buff);
-	if (ret != BLE_STATUS_SUCCESS){
-		PRINTF("Error while updating Sensor Fusion characteristic: 0x%02X\n",ret) ;
+	if (ret != BLE_STATUS_SUCCESS)
+	{
 		return BLE_STATUS_ERROR ;
 	}
 
@@ -242,29 +151,28 @@ void Read_Request_CB(uint16_t handle)
 {
 	tBleStatus ret;
 
-	if(handle == AccGyroMagCharHandle + 1)
+	if (handle == SmartShelfLeftStockCharHandle + 1)
 	{
-		Acc_Update(5);
-	}
-	else if (handle == EnvironmentalCharHandle + 1)
-	{
-		float data_t, data_p;
-		data_t = 0;//27.0 + ((uint64_t)rand()*5)/RAND_MAX; //T sensor emulation
-		data_p = 0;//1000.0 + ((uint64_t)rand()*100)/RAND_MAX; //P sensor emulation
-		BlueMS_Environmental_Update();
+		ret = GattDB_UpdateSmartShelfLeftStock(5);
 	}
 
-	if(connection_handle !=0)
+	else if (handle == SmartShelfHeaderCharHandle + 1)
+	{
+		ret = GattDB_GetHeaderCharacteristic();
+	}
+
+	if (connection_handle !=0)
 	{
 		ret = aci_gatt_allow_read(connection_handle);
-		if (ret != BLE_STATUS_SUCCESS)
-		{
-			PRINTF("aci_gatt_allow_read() failed: 0x%02x\r\n", ret);
-		}
+	}
+
+	if (ret != BLE_STATUS_SUCCESS)
+	{
+		// Log an BLE error
 	}
 }
 
-tBleStatus BlueMS_Environmental_Update()
+tBleStatus GattDB_GetHeaderCharacteristic()
 {
 	tBleStatus ret;
 	uint8_t buff[7];
@@ -277,11 +185,11 @@ tBleStatus BlueMS_Environmental_Update()
 	buff[5] = 5; // Initial value of Snacks
 	buff[6] = 3; // Remaining value of snacks
 
-	ret = aci_gatt_update_char_value(HWServW2STHandle, EnvironmentalCharHandle,
+	ret = aci_gatt_update_char_value(SmartShelfServiceHandle, SmartShelfHeaderCharHandle,
 			0, 7, buff);
 
-	if (ret != BLE_STATUS_SUCCESS){
-		PRINTF("Error while updating TEMP characteristic: 0x%04X\n",ret) ;
+	if (ret != BLE_STATUS_SUCCESS)
+	{
 		return BLE_STATUS_ERROR ;
 	}
 
