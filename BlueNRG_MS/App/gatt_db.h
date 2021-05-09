@@ -19,6 +19,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "bluenrg_def.h"
+#include "eeprom.h"
+#include "log.h"
 
 /**
  * @brief Number of application services
@@ -52,10 +54,10 @@ typedef union Char_UUID_t_s {
 } Char_UUID_t;
 
 tBleStatus GattDB_RegisterSmartShelfService(void);
+void       GattDB_ReadRequest(uint16_t handle);
 tBleStatus GattDB_GetHeaderCharacteristic(void);
-tBleStatus GattDB_UpdateSmartShelfLeftStock(uint8_t nLeftStock);
-
-void Read_Request_CB(uint16_t handle);
+tBleStatus GattDB_UpdateSmartShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock);
+tBleStatus GattDB_GetSystemMessage(void);
 
 extern uint8_t Services_Max_Attribute_Records[];
 

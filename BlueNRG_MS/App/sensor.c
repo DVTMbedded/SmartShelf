@@ -37,7 +37,8 @@ extern uint8_t bnrg_expansion_board;
 __IO uint8_t set_connectable = 1;
 __IO uint16_t connection_handle = 0;
 __IO uint8_t  notification_enabled = FALSE;
-__IO uint32_t connected = FALSE;
+
+static BLE_CONNECTION_STATUS g_eBLEConnectionStatus = BLE_DISCONNECTED;
 
 extern uint16_t EnvironmentalCharHandle;
 extern uint16_t AccGyroMagCharHandle;
@@ -74,6 +75,15 @@ void Set_DeviceConnectable(void)
 			sizeof(local_name), local_name, 0, NULL, 0, 0);
 
 	aci_gap_update_adv_data(14, manuf_data);
+}
+
+/*******************************************************************************
+ * Description    : Puts the device in connectable mode.
+ * Return         : BLE_CONNECTION_STATUS - BLE_DISCONNECTED or BLE_CONNECTED.
+ *******************************************************************************/
+BLE_CONNECTION_STATUS GetBLEConnectionStatus()
+{
+	return g_eBLEConnectionStatus;
 }
 
 /**
@@ -123,7 +133,7 @@ void user_notify(void* pData)
 		case EVT_BLUE_GATT_READ_PERMIT_REQ:
 		{
 			evt_gatt_read_permit_req *pr = (void*)blue_evt->data;
-			Read_Request_CB(pr->attr_handle);
+			GattDB_ReadRequest(pr->attr_handle);
 		}
 		break;
 		}
@@ -140,7 +150,7 @@ void user_notify(void* pData)
  */
 void GAP_DisconnectionComplete_CB(void)
 {
-	connected = FALSE;
+	g_eBLEConnectionStatus = BLE_DISCONNECTED;
 	/* Make the device connectable again. */
 	set_connectable = TRUE;
 	notification_enabled = FALSE;
@@ -154,7 +164,7 @@ void GAP_DisconnectionComplete_CB(void)
  */
 void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
 {
-	connected = TRUE;
+	g_eBLEConnectionStatus = BLE_CONNECTED;
 	connection_handle = handle;
 }
 

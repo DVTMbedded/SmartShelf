@@ -23,7 +23,13 @@
 #define BLE_DEVICE_NAME   'S','M','A','R','T',' ','S', 'H', 'E', 'L', 'F'
 #define BDADDR_SIZE        6
 
+typedef enum {
+	BLE_DISCONNECTED = 0,
+	BLE_CONNECTED    = 1
+}BLE_CONNECTION_STATUS;
+
 void Set_DeviceConnectable(void);
+BLE_CONNECTION_STATUS GetBLEConnectionStatus();
 void user_notify(void * pData);
 
 extern uint8_t Application_Max_Attribute_Records[];

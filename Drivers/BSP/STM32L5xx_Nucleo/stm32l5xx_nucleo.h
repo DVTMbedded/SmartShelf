@@ -167,7 +167,7 @@
 typedef enum
 {
   LED2 = 0,
-  LED_GREEN = LED2,
+  LED_BLUE = LED2,
 }Led_TypeDef;
 
 typedef enum

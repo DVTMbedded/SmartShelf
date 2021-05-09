@@ -21,6 +21,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l5xx_it.h"
+#include "stm32l5xx_nucleo.h"
+#include "sensor.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -184,11 +186,29 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
+  static uint16_t nLedCntr = 0;
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
+  if (GetBLEConnectionStatus() == BLE_CONNECTED)
+  {
+	  // toggle Blue LED every 0.5 seconds if BLE is connected
+	  if (++nLedCntr == 500)
+	  {
+		  nLedCntr = 0;
+		  BSP_LED_Toggle(LED_BLUE);
+	  }
+  }
+  else
+  {
+	  if (nLedCntr)
+	  {
+		  BSP_LED_Off(LED_BLUE);
+		  nLedCntr = 0;
+	  }
+  }
   /* USER CODE END SysTick_IRQn 1 */
 }
 

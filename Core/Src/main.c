@@ -166,10 +166,10 @@ static void GPIO_Init(void)
 	HAL_PWREx_EnableVddIO2();
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|LED_GREEN_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOA, BT_CS_Pin|LED_RED_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, BT_CS_Pin, GPIO_PIN_SET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(BT_RESET_GPIO_Port, BT_RESET_Pin, GPIO_PIN_RESET);
@@ -177,15 +177,15 @@ static void GPIO_Init(void)
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(UCPD_DBN_GPIO_Port, UCPD_DBN_Pin, GPIO_PIN_RESET);
 
-	/*Configure GPIO pins : PC0 LED_GREEN_Pin */
-	GPIO_InitStruct.Pin = GPIO_PIN_0|LED_GREEN_Pin;
+	/*Configure GPIO pins : PC0 */
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : BT_CS_Pin LED_RED_Pin */
-	GPIO_InitStruct.Pin = BT_CS_Pin|LED_RED_Pin;
+	/*Configure GPIO pins : BT_CS_Pin */
+	GPIO_InitStruct.Pin = BT_CS_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

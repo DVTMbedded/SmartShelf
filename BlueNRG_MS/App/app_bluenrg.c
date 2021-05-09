@@ -46,7 +46,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 extern volatile uint8_t set_connectable;
-extern volatile int     connected;
+
 /* at startup, suppose the X-NUCLEO-IDB04A1 is used */
 uint8_t bnrg_expansion_board = IDB04A1;
 uint8_t bdaddr[BDADDR_SIZE];
@@ -162,8 +162,7 @@ void BlueNRG_Process(void)
 static void User_Init(void)
 {
 	BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
-	BSP_LED_Init(LED2);
-
+	BSP_LED_Init(LED_BLUE);
 	BSP_COM_Init(COM1);
 }
 
@@ -196,11 +195,9 @@ static void User_Process(void)
 		/* Debouncing */
 		HAL_Delay(50);
 
-		BSP_LED_Toggle(LED2);
-
-		if (connected)
+		if (GetBLEConnectionStatus() == BLE_CONNECTED)
 		{
-			GattDB_UpdateSmartShelfLeftStock(counter);
+			GattDB_UpdateSmartShelfLeftStock(0, counter);
 
 			if (--counter < 0)
 			{
