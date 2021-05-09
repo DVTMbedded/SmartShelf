@@ -80,7 +80,7 @@ M95640_STATUS M95640_ReadPage(uint16_t address, uint8_t* rxBuff, uint8_t size)
 	}
 
 	// Check if SPI communication is not used from BLE module (or if BLE module is initialized)
-	else if (HAL_GPIO_ReadPin(HCI_TL_SPI_CS_PORT, HCI_TL_SPI_CS_PIN) == GPIO_PIN_RESET)
+	else if (HAL_GPIO_ReadPin(HCI_TL_SPI_CS_PORT, HCI_TL_SPI_CS_PIN) == GPIO_PIN_RESET && GetBLEConnectionStatus() == BLE_CONNECTED)
 	{
 		eStatus = M95640_ERROR_SPI_BUSY;
 	}

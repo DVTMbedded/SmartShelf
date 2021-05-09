@@ -1,23 +1,9 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
+/*******************************************************************************
+ * File Name          : main.h
+ * Author             : Denislav Trifonov
+ * Date               : 11-11-2020
+ * Description        : Main program file
+ ********************************************************************************/
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
@@ -74,6 +60,9 @@ void Error_Handler(void);
 #define BSP_BUTTON_EXTI_IRQn EXTI13_IRQn
 #define VBUS_SENSE_Pin GPIO_PIN_2
 #define VBUS_SENSE_GPIO_Port GPIOC
+#define ToF_IT_Pin GPIO_PIN_3
+#define ToF_IT_GPIO_Port GPIOC
+#define ToF_IT_EXTI_IRQn EXTI3_IRQn
 #define BT_CS_Pin GPIO_PIN_2
 #define BT_CS_GPIO_Port GPIOA
 #define BT_IRQ_Pin GPIO_PIN_3
@@ -87,6 +76,8 @@ void Error_Handler(void);
 #define ST_LINK_VCP_TX_GPIO_Port GPIOG
 #define ST_LINK_VCP_RX_Pin GPIO_PIN_8
 #define ST_LINK_VCP_RX_GPIO_Port GPIOG
+#define LED_BLUE_Pin GPIO_PIN_7
+#define LED_BLUE_GPIO_Port GPIOB
 #define LED_GREEN_Pin GPIO_PIN_7
 #define LED_GREEN_GPIO_Port GPIOC
 #define LED_RED_Pin GPIO_PIN_9
@@ -103,4 +94,3 @@ void Error_Handler(void);
 
 #endif /* __MAIN_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

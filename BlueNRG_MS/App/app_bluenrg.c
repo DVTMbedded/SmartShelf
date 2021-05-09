@@ -162,8 +162,6 @@ void BlueNRG_Process(void)
 static void User_Init(void)
 {
 	BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
-	BSP_LED_Init(LED_BLUE);
-	BSP_COM_Init(COM1);
 }
 
 /**

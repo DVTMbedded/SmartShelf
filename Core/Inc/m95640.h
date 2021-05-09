@@ -17,6 +17,7 @@
 #include "stm32l5xx_nucleo_bus.h"
 #include "stm32l5xx_hal.h"
 #include "main.h"
+#include "sensor.h"
 
 #define M95640_SIZE_BYTES	   8192
 #define M95640_PAGE_SIZE_BYTES 32
