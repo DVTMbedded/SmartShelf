@@ -24,6 +24,7 @@
 #include "stm32l5xx_nucleo.h"
 #include "sensor.h"
 #include "led.h"
+#include "console_drv.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -263,7 +264,7 @@ void LPUART1_IRQHandler(void)
   /* USER CODE BEGIN LPUART1_IRQn 0 */
 
   /* USER CODE END LPUART1_IRQn 0 */
-  HAL_UART_IRQHandler(ConsoleDrv_GetUartHandleTypeDef());
+  HAL_UART_IRQHandler((UART_HandleTypeDef* )ConsoleDrv_GetUartHandleTypeDef());
   /* USER CODE BEGIN LPUART1_IRQn 1 */
 
   /* USER CODE END LPUART1_IRQn 1 */

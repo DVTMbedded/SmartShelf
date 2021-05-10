@@ -38,10 +38,10 @@ static uint8_t g_arrToFGPIOInterruptPriority[SENSORS_SUPPORTED] =
 #endif
 
 static GPIO_InitTypeDef g_arrToFXShutDownPin[SENSORS_SUPPORTED] = {
-		{GPIO_PIN_1, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, 0}};
+		{GPIO_PIN_14, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, 0}};
 
 static GPIO_TypeDef* g_arrToFXShutDownPorts[SENSORS_SUPPORTED] =
-{GPIOA};
+{GPIOF};
 
 static VL53LX_Dev_t g_ToFSensorDriverData[SENSORS_SUPPORTED];
 static VL53LX_MultiRangingData_t g_ToFSensorMeasurementData[SENSORS_SUPPORTED];
