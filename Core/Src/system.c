@@ -21,6 +21,9 @@ void System_Init()
 
 	/* Configure the system clock */
 	SystemClock_Config();
+
+	__HAL_RCC_USART1_CLK_ENABLE();
+	__HAL_RCC_LPUART1_CLK_ENABLE();
 }
 
 /**

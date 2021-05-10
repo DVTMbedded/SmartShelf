@@ -255,6 +255,21 @@ void EXTI13_IRQHandler(void)
 	/* USER CODE END EXTI13_IRQn 1 */
 }
 
+/**
+  * @brief This function handles LPUART1 global interrupt / LPUART1 wake-up interrupt through EXTI line 31.
+  */
+void LPUART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN LPUART1_IRQn 0 */
+
+  /* USER CODE END LPUART1_IRQn 0 */
+  HAL_UART_IRQHandler(ConsoleDrv_GetUartHandleTypeDef());
+  /* USER CODE BEGIN LPUART1_IRQn 1 */
+
+  /* USER CODE END LPUART1_IRQn 1 */
+}
+
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
