@@ -44,17 +44,27 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths.2089353306" name="Include paths (-I)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;D:\Work\University\Master Thesis\Firmware\SmartShelf\Drivers\BSP\53L3A2&quot;"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
-									<listOptionValue builtIn="false" value="&quot;D:\Work\University\Master Thesis\Firmware\SmartShelf\Drivers\BSP\Components\vl53l3cx&quot;"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32L5xx_HAL_Driver/Inc"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32L5xx/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32L5xx_HAL_Driver/Inc/Legacy"/>
+									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32L5xx/Include"/>
+									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
+									<listOptionValue builtIn="false" value="../BlueNRG_MS/App"/>
+									<listOptionValue builtIn="false" value="../BlueNRG_MS/Target"/>
+									<listOptionValue builtIn="false" value="../Drivers/BSP/STM32L5xx_Nucleo"/>
+									<listOptionValue builtIn="false" value="../Middlewares/ST/BlueNRG-MS/utils"/>
+									<listOptionValue builtIn="false" value="../Middlewares/ST/BlueNRG-MS/includes"/>
+									<listOptionValue builtIn="false" value="../Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Basic"/>
+									<listOptionValue builtIn="false" value="&quot;D:\Work\University\Master Thesis\Firmware\SmartShelf\Drivers\BSP\53L3A2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:\Work\University\Master Thesis\Firmware\SmartShelf\Drivers\BSP\Components\vl53l3cx&quot;"/>
 									<listOptionValue builtIn="false" value="../Core/Console"/>
 									<listOptionValue builtIn="false" value="../Core/ToF"/>
 									<listOptionValue builtIn="false" value="../Core/LEDs"/>
 									<listOptionValue builtIn="false" value="&quot;../CORE_LOC\System&quot;"/>
+									<listOptionValue builtIn="false" value="../Core/RTC"/>
+									<listOptionValue builtIn="false" value="&quot;D:/Work/University/Master Thesis/Firmware/BLE_Example/Drivers/BSP/STM32L5xx_Nucleo&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:/Work/University/Master Thesis/Firmware/SmartShelf/Core/EEPROM&quot;"/>
+									<listOptionValue builtIn="false" value="../Core/Src"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.2009924467" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -131,7 +141,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry excluding="BSP/X-NUCLEO-IDB0xA1/stm32_bluenrg_ble_dma_lp.c|BSP/X-NUCLEO-IDB0xA1/stm32_bluenrg_ble.c|Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Template/hci_tl.h|Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Template/hci_tl_template.c|Middlewares/ST/BlueNRG-MS/profiles/ANCS/Src/ancs.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

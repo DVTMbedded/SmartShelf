@@ -43,8 +43,12 @@ extern "C" {
 #include "console.h"
 #include "tof.h"
 #include "led.h"
-#include  <D:\Work\University\Master Thesis\Firmware\SmartShelf\Core\System\system.h>
+#include  "D:\Work\University\Master Thesis\Firmware\SmartShelf\Core\System\system.h"
 #include "rtc.h"
+#include "hci_tl_interface.h"
+#include "stm32l5xx_nucleo.h"
+
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
