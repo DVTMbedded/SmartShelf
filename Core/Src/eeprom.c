@@ -103,6 +103,27 @@ EEPROM_SHELF_INFO* EEPROM_GetShelf(uint8_t nIndex)
 }
 
 // ===========================================================
+SHELF_TYPES EEPROM_GetShelfType(uint8_t nIndex)
+// ===========================================================
+{
+	if (nIndex < g_nShelvesCount)
+	{
+		return g_arrShelves[nIndex].m_eShelfType;
+	}
+	return NONE;
+}
+
+// ===========================================================
+uint8_t EEPROM_GetShelfInitialStock(uint8_t nIndex)
+// ===========================================================
+{
+	if (nIndex < g_nShelvesCount)
+	{
+		return g_arrShelves[nIndex].m_nInitialStock;
+	}
+}
+
+// ===========================================================
 void EEPROM_RegisterNewShelf(EEPROM_SHELF_INFO *pShelf)
 // ===========================================================
 {

@@ -16,7 +16,8 @@
 
 typedef enum {
 	DRINK = 0,
-	SNACK = 1
+	SNACK = 1,
+	NONE  = 2
 }SHELF_TYPES;
 
 typedef struct {
@@ -32,6 +33,8 @@ void EEPROM_RegisterNewShelf(EEPROM_SHELF_INFO *pShelf);
 void EEPROM_UpdateShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock);
 
 EEPROM_SHELF_INFO* EEPROM_GetShelf(uint8_t nIndex);
+SHELF_TYPES        EEPROM_GetShelfType(uint8_t nIndex);
+uint8_t            EEPROM_GetShelfInitialStock(uint8_t nIndex);
 uint8_t            EEPROM_GetTotalShelvesCount();
 
 

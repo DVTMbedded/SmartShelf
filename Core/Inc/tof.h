@@ -15,12 +15,17 @@
 #include "main.h"
 #include "vl53lx_def.h"
 #include "led.h"
+#include "eeprom.h"
 
 #define SENSORS_SUPPORTED 1
 
 #define XNUCLEO_SENSOR_LEFT   0
 #define XNUCLEO_SENSOR_CENTER 1
 #define XNUCLEO_SENSOR_RIGHT  2
+
+#define DRINK_SIZE_MM          60
+#define TOF_INITIAL_OFFSET_MM  50
+#define TOF_OFFSET_DISTANCE_MM 100
 
 typedef enum {
 	TOF_CENTRAL = 0,
@@ -35,6 +40,7 @@ typedef enum {
 	STATE_NOT_INIT,
 	STATE_INIT_IN_PROCESS,
 	STATE_IDLE,
+	STATE_PENDING_MEASUREMENT,
 	STATE_MEASURING,
 	STATE_IGNORE_FIRST_DATA,
 	STATE_ERROR
@@ -57,11 +63,9 @@ typedef enum {
 
 void ToF_Init(TOF_SUPPORTED_SENSORS eSensor);
 void ToF_Exec();
+void ToF_InitiateMeasurement(TOF_SUPPORTED_SENSORS eSensor);
 TOF_STATUS ToF_Measure(TOF_SUPPORTED_SENSORS eSensor);
 VL53LX_MultiRangingData_t* ToF_GetDistance_mm(TOF_SUPPORTED_SENSORS eSensor);
-//uint16_t Tof_GetDistanceAveraged_mm(TOF_SUPPORTED_SENSORS eSensor);
-
-void ToF_Exec();
-
+uint8_t ToF_GetLeftItems(TOF_SUPPORTED_SENSORS eSensor);
 
 #endif /* TOF_TOF_H_ */

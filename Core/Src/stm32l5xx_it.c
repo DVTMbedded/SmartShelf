@@ -25,6 +25,7 @@
 #include "sensor.h"
 #include "led.h"
 #include "console_drv.h"
+#include "tof.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -190,6 +191,13 @@ void SysTick_Handler(void)
 	/* USER CODE BEGIN SysTick_IRQn 0 */
 	static uint16_t nBLEStatusLedCntr = 0;
 	static uint16_t m_nSystemStatusLedPeriodCntr = 0;
+	static uint16_t m_nToFMeasurementCntr = 0;
+
+	if (++m_nToFMeasurementCntr == 100)
+	{
+		m_nToFMeasurementCntr = 0;
+		ToF_InitiateMeasurement(TOF_CENTRAL);
+	}
 
 	if (++m_nSystemStatusLedPeriodCntr == 500)
 	{

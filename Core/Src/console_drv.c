@@ -145,7 +145,6 @@ void ConsoleDrv_Printf(char *Message, ...)
 	char iStr[10];
 	char chArg = 0;
 	char *strArg = 0;
-	float f32Arg = 0.0f;
 
 	while(Message[symbol] != '\0')
 	{
@@ -174,12 +173,6 @@ void ConsoleDrv_Printf(char *Message, ...)
 			case 's':
 				strArg = va_arg(arguments,char *);
 				ConsoleDrv_Puts(strArg);
-				break;
-
-			case 'f':
-				f32Arg = va_arg(arguments, double);
-				sprintf(iStr, "%.2f", f32Arg);
-				ConsoleDrv_Puts(iStr);
 				break;
 
 			default:

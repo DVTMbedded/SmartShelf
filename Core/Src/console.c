@@ -96,7 +96,6 @@ void Service_StartMeasurement(uint8_t *RxBuff)
 void Service_GetDistance(uint8_t *RxBuff)
 /* ======================================================*/
 {
-#if 1
 	VL53LX_MultiRangingData_t* pData = ToF_GetDistance_mm(TOF_CENTRAL);
 
 	if (pData != NULL)
@@ -123,7 +122,6 @@ void Service_GetDistance(uint8_t *RxBuff)
 	{
 		ConsoleDrv_Puts("Error measuring distance!");
 	}
-#endif
 }
 
 /* ====================================================== */

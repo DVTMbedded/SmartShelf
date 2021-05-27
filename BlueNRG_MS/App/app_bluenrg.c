@@ -173,7 +173,8 @@ static void User_Init(void)
  */
 static void User_Process(void)
 {
-	static int8_t counter = 5;
+	static uint8_t arrShelveItems[MAX_SHELVES_COUNT];
+	BLE_CHAR_UPDATE_STATUS eBleCharStatus = BLE_CHAR_IDLE;
 
 	if (set_connectable)
 	{
@@ -181,29 +182,16 @@ static void User_Process(void)
 		set_connectable = FALSE;
 	}
 
-	/* Check if the user has pushed the button */
-	if (user_button_pressed)
+	for (uint8_t i = 0; i < EEPROM_GetTotalShelvesCount(); i++)
 	{
-		/* Debouncing */
-		HAL_Delay(50);
+		uint8_t nCurrentShelfItems = ToF_GetLeftItems(i);
 
-		/* Wait until the User Button is released */
-		while (BSP_PB_GetState(BUTTON_KEY) == !user_button_init_state);
-
-		/* Debouncing */
-		HAL_Delay(50);
-
-		if (GetBLEConnectionStatus() == BLE_CONNECTED)
+		if (arrShelveItems[i] != nCurrentShelfItems)
 		{
-			GattDB_UpdateSmartShelfLeftStock(0, counter);
-
-			if (--counter < 0)
-			{
-				counter = 5;
-			}
+			arrShelveItems[i] = nCurrentShelfItems;
+			eBleCharStatus = BLE_CHAR_UPDATED;
+			GattDB_UpdateSmartShelfLeftStock(i, arrShelveItems[i]);
 		}
-		/* Reset the User Button flag */
-		user_button_pressed = 0;
 	}
 }
 
