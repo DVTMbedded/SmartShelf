@@ -17,6 +17,7 @@
 #include "vl53lx_def.h"
 #include "led.h"
 #include "eeprom.h"
+#include "log.h"
 
 #define SENSORS_SUPPORTED 1
 
@@ -49,6 +50,11 @@ typedef enum {
 	STATE_IGNORE_FIRST_DATA,
 	STATE_ERROR
 }TOF_STATE;
+
+typedef enum {
+	MEASUREMENT_NOT_PERFORMED = 0,
+	MEASUREMENT_PERFORMED     = 1
+}TOF_MEASUREMENT_PERFORMED;
 
 typedef enum {
 	TOF_MEASURING_MODE_INTERRUPT,

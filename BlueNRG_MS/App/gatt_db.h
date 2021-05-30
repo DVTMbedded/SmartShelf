@@ -21,6 +21,7 @@
 #include "bluenrg_def.h"
 #include "eeprom.h"
 #include "log.h"
+#include "tof.h"
 
 /**
  * @brief Number of application services

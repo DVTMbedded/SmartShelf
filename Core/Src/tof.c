@@ -29,6 +29,7 @@ static VL53LX_Dev_t g_ToFSensorDriverData[SENSORS_SUPPORTED];
 static VL53LX_MultiRangingData_t g_ToFSensorMeasurementData[SENSORS_SUPPORTED];
 
 static uint8_t g_arrLeftItems[SENSORS_SUPPORTED];
+static TOF_MEASUREMENT_PERFORMED g_arrToFSensorsMeasurementPerformed[SENSORS_SUPPORTED];
 
 /* Private function prototypes -----------------------------------------------*/
 static void I2C_Init(void);
@@ -47,7 +48,8 @@ void ToF_Init(TOF_SUPPORTED_SENSORS eSensor)
 
 	EEPROM_SHELF_INFO *arrShelfInfo = EEPROM_GetShelf(eSensor);
 
-	g_eToFSensorState[eSensor] = STATE_INIT_IN_PROCESS;
+	g_eToFSensorState[eSensor]                   = STATE_INIT_IN_PROCESS;
+	g_arrToFSensorsMeasurementPerformed[eSensor] = MEASUREMENT_NOT_PERFORMED;
 
 	// Initialize the VL53L3CX GPIO pin
 	GPIO_Init(eSensor);
@@ -344,6 +346,7 @@ void GPIO_Init(TOF_SUPPORTED_SENSORS eSensor)
 	HAL_GPIO_Init(g_arrToFXShutDownPorts[eSensor], &g_arrToFXShutDownPin[eSensor]);
 }
 
+// @brief Calculate left items on the corresponding shelf
 /* ======================================================*/
 void CalculateLeftShelfItems(TOF_SUPPORTED_SENSORS eSensor)
 /* ======================================================*/
@@ -403,6 +406,26 @@ void CalculateLeftShelfItems(TOF_SUPPORTED_SENSORS eSensor)
 						{
 							g_arrLeftItems[eSensor]      = shelfLeftItems;
 							m_nDebounceCounters[eSensor] = 0;
+
+							/* Check the first ToF measurement. If the left stock value is different from the one
+							 * written in the EEPROM (before device turn off), raise a warning!
+							 */
+							if (g_arrToFSensorsMeasurementPerformed[eSensor] == MEASUREMENT_NOT_PERFORMED)
+							{
+								g_arrToFSensorsMeasurementPerformed[eSensor] = MEASUREMENT_PERFORMED;
+
+								if (shelfLeftItems > EEPROM_GetShelfLeftStock(eSensor))
+								{
+									Log_SetLogType(LOG_TYPE_WARNING);
+									Log_SetLogWarning(WARNING_STOCK_ADDED);
+								}
+
+								else if (shelfLeftItems < EEPROM_GetShelfLeftStock(eSensor))
+								{
+									Log_SetLogType(LOG_TYPE_WARNING);
+									Log_SetLogWarning(WARNING_STOCK_TAKEN);
+								}
+							}
 						}
 					}
 					else

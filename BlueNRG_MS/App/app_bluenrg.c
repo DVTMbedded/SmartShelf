@@ -174,7 +174,6 @@ static void User_Init(void)
 static void User_Process(void)
 {
 	static uint8_t arrShelveItems[MAX_SHELVES_COUNT];
-	BLE_CHAR_UPDATE_STATUS eBleCharStatus = BLE_CHAR_IDLE;
 
 	if (set_connectable)
 	{
@@ -189,37 +188,32 @@ static void User_Process(void)
 		if (arrShelveItems[i] != nCurrentShelfItems)
 		{
 			arrShelveItems[i] = nCurrentShelfItems;
-			eBleCharStatus = BLE_CHAR_UPDATED;
 			GattDB_UpdateSmartShelfLeftStock(i, arrShelveItems[i]);
 			EEPROM_UpdateShelfLeftStock(i, arrShelveItems[i]);
-
 
 			// Check if shelf is empty.
 			if (!arrShelveItems[i])
 			{
 				Log_SetLogType(LOG_TYPE_INFO);
 				Log_SetLogInfo(INFO_SHELF_EMPTY);
+
+				if (GetBLEConnectionStatus() == BLE_CONNECTED)
+				{
+					GattDB_GetSystemMessage();
+					Log_ClearLog();
+				}
 			}
 		}
 	}
 
+#if 0
 	// Check for system logs
-	if (Log_GetLogType() != LOG_NOT_AVAILABLE)
+	if (Log_GetLogType() != LOG_NOT_AVAILABLE && GetBLEConnectionStatus() == BLE_CONNECTED)
 	{
 		GattDB_GetSystemMessage();
 		Log_ClearLog();
 	}
-}
-
-/**
- * @brief  BSP Push Button callback
- * @param  Button Specifies the pin connected EXTI line
- * @retval None.
- */
-void BSP_PB_Callback(Button_TypeDef Button)
-{
-	/* Set the User Button flag */
-	user_button_pressed = 1;
+#endif
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

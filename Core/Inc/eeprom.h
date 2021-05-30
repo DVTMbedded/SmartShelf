@@ -35,6 +35,7 @@ void EEPROM_UpdateShelfLeftStock(uint8_t nIndex, uint8_t nLeftStock);
 EEPROM_SHELF_INFO* EEPROM_GetShelf(uint8_t nIndex);
 SHELF_TYPES        EEPROM_GetShelfType(uint8_t nIndex);
 uint8_t            EEPROM_GetShelfInitialStock(uint8_t nIndex);
+uint8_t 		   EEPROM_GetShelfLeftStock(uint8_t nIndex);
 uint8_t            EEPROM_GetTotalShelvesCount();
 
 

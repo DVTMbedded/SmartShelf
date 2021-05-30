@@ -121,6 +121,20 @@ uint8_t EEPROM_GetShelfInitialStock(uint8_t nIndex)
 	{
 		return g_arrShelves[nIndex].m_nInitialStock;
 	}
+
+	return 0;
+}
+
+// ===========================================================
+uint8_t EEPROM_GetShelfLeftStock(uint8_t nIndex)
+// ===========================================================
+{
+	if (nIndex < g_nShelvesCount)
+	{
+		return g_arrShelves[nIndex].m_nLeftStock;
+	}
+
+	return 0;
 }
 
 // ===========================================================

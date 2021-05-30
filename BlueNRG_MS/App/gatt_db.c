@@ -146,7 +146,18 @@ void GattDB_ReadRequest(uint16_t handle)
 
 	if (handle == SmartShelfLeftStockCharHandle + 1)
 	{
-		ret = GattDB_UpdateSmartShelfLeftStock(EEPROM_GetTotalShelvesCount(), 5);
+		for (uint8_t i = 0; i < EEPROM_GetTotalShelvesCount(); i++)
+		{
+			uint8_t nCurrentShelfItems = ToF_GetLeftItems(i);
+			GattDB_UpdateSmartShelfLeftStock(i, nCurrentShelfItems);
+
+			// Check if shelf is empty.
+			if (!nCurrentShelfItems && Log_GetLogWarning() != WARNING_NONE)
+			{
+				Log_SetLogType(LOG_TYPE_INFO);
+				Log_SetLogInfo(INFO_SHELF_EMPTY);
+			}
+		}
 	}
 
 	else if (handle == SmartShelfHeaderCharHandle + 1)
@@ -270,26 +281,29 @@ tBleStatus GattDB_GetSystemMessage(void)
 	uint8_t arrSystemLogs[2];
 	LOG_TYPE eLogType = Log_GetLogType();
 
-	arrSystemLogs[0] = (uint8_t)eLogType;
-	if (eLogType == LOG_TYPE_INFO)
+	if (eLogType != LOG_NOT_AVAILABLE)
 	{
-		arrSystemLogs[1] = Log_GetLogInfo();
-	}
-	else if (eLogType == LOG_TYPE_WARNING)
-	{
-		arrSystemLogs[1] = Log_GetLogWarning();
-	}
-	else
-	{
-		arrSystemLogs[1] = Log_GetLogError();
-	}
+		arrSystemLogs[0] = (uint8_t)eLogType;
+		if (eLogType == LOG_TYPE_INFO)
+		{
+			arrSystemLogs[1] = Log_GetLogInfo();
+		}
+		else if (eLogType == LOG_TYPE_WARNING)
+		{
+			arrSystemLogs[1] = Log_GetLogWarning();
+		}
+		else
+		{
+			arrSystemLogs[1] = Log_GetLogError();
+		}
 
-	ret = aci_gatt_update_char_value(SmartShelfServiceHandle, SmartShelfLogMsgCharHandle,
-			0, 2, arrSystemLogs);
+		ret = aci_gatt_update_char_value(SmartShelfServiceHandle, SmartShelfLogMsgCharHandle,
+				0, 2, arrSystemLogs);
 
-	if (ret != BLE_STATUS_SUCCESS)
-	{
-		return BLE_STATUS_ERROR;
+		if (ret != BLE_STATUS_SUCCESS)
+		{
+			return BLE_STATUS_ERROR;
+		}
 	}
 
 	return BLE_STATUS_SUCCESS;
