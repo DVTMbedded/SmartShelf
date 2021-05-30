@@ -191,7 +191,23 @@ static void User_Process(void)
 			arrShelveItems[i] = nCurrentShelfItems;
 			eBleCharStatus = BLE_CHAR_UPDATED;
 			GattDB_UpdateSmartShelfLeftStock(i, arrShelveItems[i]);
+			EEPROM_UpdateShelfLeftStock(i, arrShelveItems[i]);
+
+
+			// Check if shelf is empty.
+			if (!arrShelveItems[i])
+			{
+				Log_SetLogType(LOG_TYPE_INFO);
+				Log_SetLogInfo(INFO_SHELF_EMPTY);
+			}
 		}
+	}
+
+	// Check for system logs
+	if (Log_GetLogType() != LOG_NOT_AVAILABLE)
+	{
+		GattDB_GetSystemMessage();
+		Log_ClearLog();
 	}
 }
 

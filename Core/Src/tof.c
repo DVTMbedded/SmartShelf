@@ -34,6 +34,7 @@ static uint8_t g_arrLeftItems[SENSORS_SUPPORTED];
 static void I2C_Init(void);
 static void GPIO_Init(TOF_SUPPORTED_SENSORS eSensor);
 static void CalculateLeftShelfItems(TOF_SUPPORTED_SENSORS eSensor);
+static int16_t PolyfitRawDistance(int16_t nRawDistance);
 
 /* Public function definitions  -----------------------------------------------*/
 
@@ -80,6 +81,11 @@ void ToF_Init(TOF_SUPPORTED_SENSORS eSensor)
 	VL53LX_RdByte(&g_ToFSensorDriverData[eSensor], 0x0110, &nDummyByte);
 
 	if (nDummyByte != 0xAA)
+	{
+		LEDs_SetLEDState(RED_LED, LED_ON);
+	}
+
+	if (VL53LX_StopMeasurement(&g_ToFSensorDriverData[eSensor]))
 	{
 		LEDs_SetLEDState(RED_LED, LED_ON);
 	}
@@ -346,7 +352,8 @@ void CalculateLeftShelfItems(TOF_SUPPORTED_SENSORS eSensor)
 	static uint8_t m_nDebounceCounters[SENSORS_SUPPORTED];
 
 	VL53LX_MultiRangingData_t* pData = ToF_GetDistance_mm(eSensor);
-	int16_t nMeasuredDistance_mm     = 0;
+	int16_t nMeasuredDistanceRaw_mm     = 0;
+	int16_t nMeasuredDistance_mm        = 0;
 
 	if (pData != NULL)
 	{
@@ -356,10 +363,12 @@ void CalculateLeftShelfItems(TOF_SUPPORTED_SENSORS eSensor)
 			 * In order to say that a measurement is valid, 3 consecutive measurements has to be the
 			 * in the same measurement area.
 			 */
-			int8_t shelfLeftItems;
-			nMeasuredDistance_mm   = pData->RangeData[eSensor].RangeMilliMeter;
-			SHELF_TYPES eShelfType = EEPROM_GetShelfType(eSensor);
-			uint8_t eShelfMaxItems = EEPROM_GetShelfInitialStock(eSensor);
+			uint8_t shelfLeftItems;
+			float shelfRemovedItems;
+			nMeasuredDistanceRaw_mm = pData->RangeData[eSensor].RangeMilliMeter;
+			nMeasuredDistance_mm    = PolyfitRawDistance(nMeasuredDistanceRaw_mm);
+			SHELF_TYPES eShelfType  = EEPROM_GetShelfType(eSensor);
+			uint8_t eShelfMaxItems  = EEPROM_GetShelfInitialStock(eSensor);
 
 			if (eShelfType == DRINK)
 			{
@@ -367,13 +376,14 @@ void CalculateLeftShelfItems(TOF_SUPPORTED_SENSORS eSensor)
 				{
 					shelfLeftItems = eShelfMaxItems;
 				}
-				else if (nMeasuredDistance_mm > (eShelfMaxItems * DRINK_SIZE_MM + TOF_OFFSET_DISTANCE_MM))
+				else if (nMeasuredDistance_mm > ((eShelfMaxItems) * (DRINK_SIZE_MM + TOF_DISTANCE_BETWEEN_ITEMS_MM) + TOF_INITIAL_OFFSET_MM))
 				{
 					shelfLeftItems = 0;
 				}
 				else
 				{
-					shelfLeftItems = (eShelfMaxItems - (nMeasuredDistance_mm - TOF_OFFSET_DISTANCE_MM) / DRINK_SIZE_MM);
+					shelfRemovedItems = round(((float)(nMeasuredDistance_mm - TOF_INITIAL_OFFSET_MM) / (DRINK_SIZE_MM + TOF_DISTANCE_BETWEEN_ITEMS_MM)));
+					shelfLeftItems = eShelfMaxItems - shelfRemovedItems;//((nMeasuredDistance_mm - TOF_INITIAL_OFFSET_MM) / (DRINK_SIZE_MM + TOF_DISTANCE_BETWEEN_ITEMS_MM));
 
 					if (shelfLeftItems < 0)
 					{
@@ -385,22 +395,39 @@ void CalculateLeftShelfItems(TOF_SUPPORTED_SENSORS eSensor)
 					}
 				}
 
-				if (m_arrShelvesLeftItems[eSensor] == shelfLeftItems)
+				if (g_arrLeftItems[eSensor] != shelfLeftItems)
 				{
-					if (++m_nDebounceCounters[eSensor] == 3)
+					if (m_arrShelvesLeftItems[eSensor] == shelfLeftItems)
 					{
-						g_arrLeftItems[eSensor]      = shelfLeftItems;
-						m_nDebounceCounters[eSensor] = 0;
+						if (++m_nDebounceCounters[eSensor] == 3)
+						{
+							g_arrLeftItems[eSensor]      = shelfLeftItems;
+							m_nDebounceCounters[eSensor] = 0;
+						}
 					}
-				}
-				else
-				{
-					m_arrShelvesLeftItems[eSensor] = shelfLeftItems;
-					m_nDebounceCounters[eSensor]   = 0;
+					else
+					{
+						m_arrShelvesLeftItems[eSensor] = shelfLeftItems;
+						m_nDebounceCounters[eSensor]   = 0;
+					}
 				}
 			}
 		}
 	}
+}
+
+/*
+ * @brief  This function fits the measured distance with a polynomial in order to get the real distance
+ * @param  nRawDistance - measured distance by the ToF sensor
+ * @retval int16_t - polynomial fitted distance in [mm.] units
+ */
+/* ======================================================*/
+int16_t PolyfitRawDistance(int16_t nRawDistance)
+/* ======================================================*/
+{
+	float fDistancePolynomialFit = (float)nRawDistance * TOF_POLYFIT_COEF_A + TOF_POLYFIT_COEF_B;
+
+	return (int16_t)fDistancePolynomialFit;
 }
 
 /* ======================================================*/

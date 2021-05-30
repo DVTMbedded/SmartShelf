@@ -8,6 +8,7 @@
 #ifndef TOF_TOF_H_
 #define TOF_TOF_H_
 
+#include <math.h>
 #include "vl53lx_api.h"
 #include "53L3A2.h"
 #include "53l3a2.h"
@@ -19,13 +20,16 @@
 
 #define SENSORS_SUPPORTED 1
 
-#define XNUCLEO_SENSOR_LEFT   0
-#define XNUCLEO_SENSOR_CENTER 1
-#define XNUCLEO_SENSOR_RIGHT  2
+#define XNUCLEO_SENSOR_LEFT    0
+#define XNUCLEO_SENSOR_CENTER  1
+#define XNUCLEO_SENSOR_RIGHT   2
 
-#define DRINK_SIZE_MM          60
-#define TOF_INITIAL_OFFSET_MM  50
-#define TOF_OFFSET_DISTANCE_MM 100
+#define DRINK_SIZE_MM                 55
+#define TOF_INITIAL_OFFSET_MM         100
+#define TOF_DISTANCE_BETWEEN_ITEMS_MM 20
+
+#define TOF_POLYFIT_COEF_A 0.9740
+#define TOF_POLYFIT_COEF_B 26.0097
 
 typedef enum {
 	TOF_CENTRAL = 0,

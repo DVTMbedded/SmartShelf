@@ -8,9 +8,10 @@
 #define INC_LOG_H_
 
 typedef enum {
-	LOG_TYPE_INFO    = 0,
-	LOG_TYPE_WARNING = 1,
-	LOG_TYPE_ERROR   = 2
+	LOG_TYPE_INFO     = 0,
+	LOG_TYPE_WARNING  = 1,
+	LOG_TYPE_ERROR    = 2,
+	LOG_NOT_AVAILABLE = 3
 }LOG_TYPE;
 
 typedef enum {
@@ -39,5 +40,7 @@ LOG_TYPE    Log_GetLogType(void);
 LOG_INFO    Log_GetLogInfo(void);
 LOG_WARNING Log_GetLogWarning(void);
 LOG_ERROR   Log_GetLogError(void);
+
+void Log_ClearLog(void);
 
 #endif /* INC_LOG_H_ */

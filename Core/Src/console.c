@@ -10,12 +10,14 @@
 static void Service_Help(uint8_t *RxBuff);
 static void Service_StartMeasurement(uint8_t *RxBuff);
 static void Service_GetDistance(uint8_t *RxBuff);
+static void Service_GetStock(uint8_t *RxBuff);
 static void Service_Unknown(uint8_t *RxBuff);
 
 static const char*  UartCommands[] = {
 		"HELP",
 		"STAM",
 		"GETD",
+		"GETS",
 		""
 };
 
@@ -24,6 +26,7 @@ static void (*FuncPtr[])(uint8_t *RxData) =
 		&Service_Help,
 		&Service_StartMeasurement,
 		&Service_GetDistance,
+		&Service_GetStock,
 		&Service_Unknown
 };
 
@@ -76,6 +79,7 @@ void Service_Help(uint8_t *RxBuff)
 	ConsoleDrv_Puts("  - HELP - This information\r\n");
 	ConsoleDrv_Puts("  - STAM - Initiate measurement with ToF sensor\r\n");
 	ConsoleDrv_Puts("  - GETD - Get ToF sensor measurement\r\n");
+	ConsoleDrv_Puts("  - GETS - Get left shelf items\r\n");
 }
 
 /* ======================================================*/
@@ -122,6 +126,15 @@ void Service_GetDistance(uint8_t *RxBuff)
 	{
 		ConsoleDrv_Puts("Error measuring distance!");
 	}
+}
+
+/* ====================================================== */
+void Service_GetStock(uint8_t *RxBuff)
+/* ====================================================== */
+{
+	uint8_t nLeftItems = ToF_GetLeftItems(TOF_CENTRAL);
+
+	ConsoleDrv_Printf("Left items: %d", nLeftItems);
 }
 
 /* ====================================================== */

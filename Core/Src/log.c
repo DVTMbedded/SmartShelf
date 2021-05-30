@@ -7,7 +7,7 @@
 
 #include "log.h"
 
-static LOG_TYPE    g_eLogType    = LOG_TYPE_INFO;
+static LOG_TYPE    g_eLogType    = LOG_NOT_AVAILABLE;
 
 static LOG_INFO    g_eLogInfo    = INFO_SYSTEM_OK;
 static LOG_WARNING g_eLogWarning = WARNING_NONE;
@@ -88,4 +88,13 @@ LOG_ERROR Log_GetLogError(void)
 {
 	return g_eLogError;
 }
+
+/* @brief Clear previously logged system messages */
+// ===========================================================
+void Log_ClearLog(void)
+// ===========================================================
+{
+	g_eLogType = LOG_NOT_AVAILABLE;
+}
+
 // ===========================================================

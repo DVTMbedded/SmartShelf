@@ -31,6 +31,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "log.h"
+#include "tof.h"
 
 typedef enum {
 	BLE_CHAR_IDLE = 0,
